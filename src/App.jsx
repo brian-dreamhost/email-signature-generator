@@ -5,6 +5,10 @@ const TEMPLATES = [
   { id: 'modern', name: 'Modern', desc: 'Left accent bar, compact layout' },
   { id: 'minimal', name: 'Minimal', desc: 'Text only, elegant spacing' },
   { id: 'bold', name: 'Bold', desc: 'Large name with colored header' },
+  { id: 'sleek', name: 'Sleek', desc: 'Compact two-column, subtle separator' },
+  { id: 'centered', name: 'Centered', desc: 'Stacked centered layout for creatives' },
+  { id: 'elegant', name: 'Elegant', desc: 'Refined spacing, thin top accent line' },
+  { id: 'corporate', name: 'Corporate', desc: 'Structured grid, two-tone sections' },
 ]
 
 const FONTS = ['Arial', 'Helvetica', 'Georgia', 'Verdana', 'Tahoma']
@@ -87,8 +91,8 @@ function generateSignatureHTML(data, template, color, font) {
 </table>`
   }
 
-  // bold template
-  return `<table cellpadding="0" cellspacing="0" border="0" style="${base}width:100%;max-width:400px;">
+  if (template === 'bold') {
+    return `<table cellpadding="0" cellspacing="0" border="0" style="${base}width:100%;max-width:400px;">
   <tr><td style="background-color:${color};padding:14px 18px;border-radius:6px 6px 0 0;">
     <table cellpadding="0" cellspacing="0" border="0"><tr>
       ${photo ? `<td style="padding-right:14px;vertical-align:middle;"><img src="${photo}" width="60" height="60" style="border-radius:50%;border:2px solid rgba(255,255,255,0.3);display:block;" alt="${name}" /></td>` : ''}
@@ -107,6 +111,87 @@ function generateSignatureHTML(data, template, color, font) {
       ${socialLinks ? `<tr><td style="padding-top:6px;">${socialLinks}</td></tr>` : ''}
       ${cta.text && cta.url ? `<tr><td style="padding-top:10px;"><a href="${cta.url}" target="_blank" style="background-color:${color};color:#ffffff;text-decoration:none;font-size:12px;font-weight:600;padding:8px 16px;border-radius:4px;display:inline-block;">${cta.text}</a></td></tr>` : ''}
     </table>
+  </td></tr>
+</table>`
+  }
+
+  if (template === 'sleek') {
+    const contactItems = [
+      email ? `<a href="mailto:${email}" style="color:${color};text-decoration:none;font-size:12px;">${email}</a>` : '',
+      phone ? `<a href="tel:${phone}" style="color:${color};text-decoration:none;font-size:12px;">${phone}</a>` : '',
+      website ? `<a href="${website.startsWith('http') ? website : 'https://' + website}" style="color:${color};text-decoration:none;font-size:12px;">${website.replace(/^https?:\/\//, '')}</a>` : '',
+    ].filter(Boolean).join(`<span style="color:#ccc;margin:0 8px;">&#8226;</span>`)
+    return `<table cellpadding="0" cellspacing="0" border="0" style="${base}">
+  <tr>
+    ${photo ? `<td style="vertical-align:middle;padding-right:16px;"><img src="${photo}" width="72" height="72" style="border-radius:50%;display:block;" alt="${name}" /></td>` : ''}
+    <td style="vertical-align:middle;">
+      <span style="font-size:18px;font-weight:700;color:#222;display:block;letter-spacing:-0.3px;">${name || 'Your Name'}</span>
+      ${title || company ? `<span style="font-size:12px;color:#888;display:block;padding-top:3px;">${[title, company].filter(Boolean).join(' &middot; ')}</span>` : ''}
+      ${contactItems ? `<span style="display:block;padding-top:8px;">${contactItems}</span>` : ''}
+      ${socialLinks ? `<span style="display:block;padding-top:6px;">${socialLinks}</span>` : ''}
+    </td>
+  </tr>
+  ${cta.text && cta.url ? `<tr><td ${photo ? 'colspan="2"' : ''} style="padding-top:12px;"><a href="${cta.url}" target="_blank" style="background-color:${color};color:#ffffff;text-decoration:none;font-size:11px;font-weight:600;padding:7px 18px;border-radius:20px;display:inline-block;">${cta.text}</a></td></tr>` : ''}
+</table>`
+  }
+
+  if (template === 'centered') {
+    const contactParts = [
+      email ? `<a href="mailto:${email}" style="color:${color};text-decoration:none;">${email}</a>` : '',
+      phone ? `<a href="tel:${phone}" style="color:${color};text-decoration:none;">${phone}</a>` : '',
+      website ? `<a href="${website.startsWith('http') ? website : 'https://' + website}" style="color:${color};text-decoration:none;">${website.replace(/^https?:\/\//, '')}</a>` : '',
+    ].filter(Boolean).join(' &nbsp;|&nbsp; ')
+    return `<table cellpadding="0" cellspacing="0" border="0" style="${base}text-align:center;">
+  ${photo ? `<tr><td style="padding-bottom:10px;"><img src="${photo}" width="80" height="80" style="border-radius:50%;display:inline-block;border:3px solid ${color};" alt="${name}" /></td></tr>` : ''}
+  <tr><td style="font-size:20px;font-weight:700;color:#222;letter-spacing:-0.3px;">${name || 'Your Name'}</td></tr>
+  ${title ? `<tr><td style="font-size:13px;color:#666;padding-top:2px;text-transform:uppercase;letter-spacing:1.5px;font-weight:500;">${title}</td></tr>` : ''}
+  ${company ? `<tr><td style="font-size:13px;color:${color};font-weight:600;padding-top:2px;">${company}</td></tr>` : ''}
+  <tr><td style="padding-top:10px;padding-bottom:10px;"><table cellpadding="0" cellspacing="0" border="0" align="center"><tr><td style="width:40px;height:2px;background-color:${color};"></td></tr></table></td></tr>
+  ${contactParts ? `<tr><td style="font-size:12px;color:#666;">${contactParts}</td></tr>` : ''}
+  ${socialLinks ? `<tr><td style="padding-top:8px;">${socialLinks}</td></tr>` : ''}
+  ${cta.text && cta.url ? `<tr><td style="padding-top:12px;"><a href="${cta.url}" target="_blank" style="background-color:${color};color:#ffffff;text-decoration:none;font-size:12px;font-weight:600;padding:8px 20px;border-radius:4px;display:inline-block;">${cta.text}</a></td></tr>` : ''}
+</table>`
+  }
+
+  if (template === 'elegant') {
+    return `<table cellpadding="0" cellspacing="0" border="0" style="${base}border-top:3px solid ${color};padding-top:14px;">
+  <tr>
+    ${photo ? `<td style="vertical-align:top;padding-right:18px;"><img src="${photo}" width="70" height="70" style="border-radius:6px;display:block;" alt="${name}" /></td>` : ''}
+    <td style="vertical-align:top;">
+      <span style="font-size:17px;font-weight:700;color:#222;display:block;letter-spacing:-0.2px;">${name || 'Your Name'}</span>
+      ${title ? `<span style="font-size:12px;color:#888;display:block;padding-top:3px;">${title}</span>` : ''}
+      ${company ? `<span style="font-size:12px;color:${color};font-weight:600;display:block;padding-top:1px;">${company}</span>` : ''}
+      <table cellpadding="0" cellspacing="0" border="0" style="margin-top:10px;">
+        ${email ? `<tr><td style="font-size:12px;color:#555;padding-bottom:2px;"><a href="mailto:${email}" style="color:#555;text-decoration:none;">${email}</a></td></tr>` : ''}
+        ${phone ? `<tr><td style="font-size:12px;color:#555;padding-bottom:2px;"><a href="tel:${phone}" style="color:#555;text-decoration:none;">${phone}</a></td></tr>` : ''}
+        ${website ? `<tr><td style="font-size:12px;color:#555;padding-bottom:2px;"><a href="${website.startsWith('http') ? website : 'https://' + website}" style="color:${color};text-decoration:none;">${website.replace(/^https?:\/\//, '')}</a></td></tr>` : ''}
+      </table>
+      ${socialLinks ? `<div style="padding-top:8px;">${socialLinks}</div>` : ''}
+      ${cta.text && cta.url ? `<div style="padding-top:10px;"><a href="${cta.url}" target="_blank" style="color:${color};text-decoration:none;font-size:12px;font-weight:600;border-bottom:1px solid ${color};padding-bottom:1px;">${cta.text} &rarr;</a></div>` : ''}
+    </td>
+  </tr>
+</table>`
+  }
+
+  // corporate template
+  return `<table cellpadding="0" cellspacing="0" border="0" style="${base}width:100%;max-width:420px;">
+  <tr><td style="padding:14px 16px;background-color:#f8f8f8;border-radius:6px;">
+    <table cellpadding="0" cellspacing="0" border="0" width="100%"><tr>
+      ${photo ? `<td style="vertical-align:top;padding-right:14px;width:65px;"><img src="${photo}" width="60" height="60" style="border-radius:6px;display:block;" alt="${name}" /></td>` : ''}
+      <td style="vertical-align:top;">
+        <span style="font-size:16px;font-weight:700;color:#222;display:block;">${name || 'Your Name'}</span>
+        ${title || company ? `<span style="font-size:12px;color:#777;display:block;padding-top:2px;">${[title, company].filter(Boolean).join(' | ')}</span>` : ''}
+      </td>
+    </tr></table>
+    <table cellpadding="0" cellspacing="0" border="0" width="100%" style="margin-top:12px;border-top:1px solid #e0e0e0;padding-top:10px;">
+      <tr>
+        ${email ? `<td style="font-size:11px;color:#555;vertical-align:top;"><span style="color:#999;display:block;">Email</span><a href="mailto:${email}" style="color:${color};text-decoration:none;">${email}</a></td>` : ''}
+        ${phone ? `<td style="font-size:11px;color:#555;vertical-align:top;${email ? 'padding-left:20px;' : ''}"><span style="color:#999;display:block;">Phone</span><a href="tel:${phone}" style="color:${color};text-decoration:none;">${phone}</a></td>` : ''}
+      </tr>
+      ${website ? `<tr><td ${email && phone ? 'colspan="2"' : ''} style="font-size:11px;color:#555;padding-top:6px;"><span style="color:#999;display:block;">Website</span><a href="${website.startsWith('http') ? website : 'https://' + website}" style="color:${color};text-decoration:none;">${website.replace(/^https?:\/\//, '')}</a></td></tr>` : ''}
+    </table>
+    ${socialLinks ? `<div style="padding-top:10px;border-top:1px solid #e0e0e0;margin-top:10px;">${socialLinks}</div>` : ''}
+    ${cta.text && cta.url ? `<div style="padding-top:10px;"><a href="${cta.url}" target="_blank" style="background-color:${color};color:#ffffff;text-decoration:none;font-size:11px;font-weight:600;padding:7px 16px;border-radius:4px;display:inline-block;">${cta.text}</a></div>` : ''}
   </td></tr>
 </table>`
 }
@@ -209,7 +294,7 @@ export default function App() {
               <div className="space-y-4">
                 <div>
                   <label className="text-xs text-galactic block mb-2">Template</label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                     {TEMPLATES.map(t => (
                       <button key={t.id} onClick={() => setTemplate(t.id)} className={`text-left p-3 rounded-lg border text-sm transition-colors ${template === t.id ? 'border-azure bg-azure/10 text-white' : 'border-metal/30 text-galactic hover:border-metal/50'}`}>
                         <div className="font-medium">{t.name}</div>
@@ -254,7 +339,7 @@ export default function App() {
 
           {/* Preview & Export */}
           <div className="space-y-6">
-            <div className="card-gradient border border-metal/20 rounded-2xl p-5 sticky top-6">
+            <div className="card-gradient border border-metal/20 rounded-2xl p-5 sticky top-6 max-h-[calc(100vh-3rem)] overflow-y-auto">
               <h2 className="text-lg font-semibold text-white mb-4">Live Preview</h2>
               <div className="bg-white rounded-lg p-6 text-sm text-gray-600" style={{ fontFamily: font }}>
                 <p className="mb-4" style={{ color: '#999', fontSize: '13px' }}>Thanks for your email. I'll get back to you shortly.</p>
